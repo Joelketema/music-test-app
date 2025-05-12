@@ -7,8 +7,8 @@ const {
     updateSong,
     deleteSong,
     getAllStats,
-    getSongsByArtist,
-    getSongsByGenre,
+
+    searchSongs,
 } = require("../controllers/SongController");
 
 router.get("/", getAllSongs);
@@ -16,6 +16,6 @@ router.post("/", createSong);
 router.put("/:id", updateSong);
 router.delete("/:id", deleteSong);
 router.get("/stats", getAllStats);
-router.post("/byArtist", getSongsByArtist);
-router.post("/byGenre", getSongsByGenre);
+router.post("/search", searchSongs);
+
 module.exports = router;

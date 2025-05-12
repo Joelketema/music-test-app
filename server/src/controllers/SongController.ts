@@ -139,41 +139,26 @@ const getAllStats = async (req: Request, res: Response) => {
     }
 };
 
-const getSongsByGenre = async (req: Request, res: Response) => {
-    const { genre } = req.body;
-    if (!genre) {
-        return res.status(400).json({ message: "Genre is required" });
-    }
-    console.log("Fetching songs for genre:", genre);
-    try {
-        const songs = await Song.find({
-            genre: { $regex: genre, $options: "i" },
-        });
-        if (songs.length === 0) {
-            return res
-                .status(404)
-                .json({ message: "No songs found for this genre" });
-        }
-        res.status(200).json(songs);
-    } catch (error) {
-        console.error("Error fetching songs by genre:", error);
-        res.status(500).json({ message: "Error fetching songs by genre" });
-    }
-};
-const getSongsByArtist = async (req: Request, res: Response) => {
-    const { artist } = req.body;
+const searchSongs = async (req: Request, res: Response) => {
+    const { query } = req.body;
 
-    if (!artist) {
-        return res.status(400).json({ message: "Artist is required" });
+    if (!query) {
+        return res.status(400).json({ message: "Search field is required" });
     }
     try {
         const songs = await Song.find({
-            artist: { $regex: artist, $options: "i" },
+            $or: [
+                { artist: { $regex: query, $options: "i" } },
+                { title: { $regex: query, $options: "i" } },
+                { album: { $regex: query, $options: "i" } },
+                { genre: { $regex: query, $options: "i" } },
+            ],
         });
         if (songs.length === 0) {
             return res
-                .status(404)
-                .json({ message: "No songs found for this artist" });
+                .status(200)
+
+                .json([]);
         }
         res.status(200).json(songs);
     } catch (error) {
@@ -188,6 +173,6 @@ module.exports = {
     updateSong,
     deleteSong,
     getAllStats,
-    getSongsByGenre,
-    getSongsByArtist,
+
+    searchSongs,
 };
