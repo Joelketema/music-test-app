@@ -104,20 +104,6 @@ function* filterByQuerySaga(action: any) {
     }
 }
 
-function* filterByGenreSaga(action: any) {
-    try {
-        const { data } = yield call(axios.post, `${baseUrl}/search`, {
-            query: action.payload,
-        });
-
-        yield put(setSongs(data));
-    } catch (error: any) {
-        console.error("Genre filter failed:", error.message);
-
-        yield put(fetchSongs());
-    }
-}
-
 export default function* songsSaga() {
     yield takeEvery(fetchSongs.type, fetchSongsSaga);
     yield takeEvery(addSong.type, addSongSaga);

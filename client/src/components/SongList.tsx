@@ -11,7 +11,6 @@ import {
 } from "../store/songSlice";
 import type { Song } from "../interfaces/Song";
 import Loading from "./Loading";
-import { toast } from "react-toastify";
 
 const SongList = () => {
     const dispatch = useDispatch();
