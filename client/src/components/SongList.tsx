@@ -7,10 +7,12 @@ import {
     deleteSong,
     fetchSongs,
     filterByQuery,
+    resetSuccess,
     updateSong,
 } from "../store/songSlice";
 import type { Song } from "../interfaces/Song";
 import Loading from "./Loading";
+import { toast } from "react-toastify";
 
 const SongList = () => {
     const dispatch = useDispatch();
@@ -48,6 +50,13 @@ const SongList = () => {
             dispatch(fetchSongs());
         }
     };
+
+    useEffect(() => {
+        if (success) {
+            setShowModal(false);
+            dispatch(resetSuccess());
+        }
+    }, [success, dispatch]);
 
     return (
         <div css={container}>
@@ -184,10 +193,10 @@ const SongList = () => {
                                         album,
                                     });
                                 } else {
-                                    // if (!title || !artist || !album || !genre) {
-                                    //     toast.error("All fields are required");
-                                    //     return;
-                                    // }
+                                    if (!title || !artist || !album || !genre) {
+                                        toast.error("All fields are required");
+                                        return;
+                                    }
                                     handleAddSong({
                                         title,
                                         artist,
@@ -196,10 +205,7 @@ const SongList = () => {
                                     });
                                 }
 
-                                if (success) {
-                                    form.reset();
-                                    setShowModal(false);
-                                }
+                                form.reset();
                             }}
                             css={formStyle}
                         >
@@ -235,6 +241,7 @@ const SongList = () => {
                             >
                                 {edit ? "Update" : "Add"}
                             </button>
+
                             <button
                                 type="button"
                                 onClick={() => setShowModal(false)}
@@ -292,7 +299,7 @@ const button = css`
         cursor: not-allowed;
     }
 
-    & + & {
+    & {
         margin-left: 8px;
     }
 `;
@@ -410,4 +417,8 @@ const formStyle = css`
     display: flex;
     flex-direction: column;
     gap: 10px;
+
+    button {
+        margin-left: 0;
+    }
 `;

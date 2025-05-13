@@ -53,6 +53,7 @@ function* updateSongSaga(action: any) {
         );
         yield call(fetchSongsSaga);
         yield put(fetchStats());
+        yield put(setSuccess());
         toast.success("Song updated successfully");
     } catch (error) {
         console.error("Update song failed:", error);

@@ -18,6 +18,16 @@ const createSong = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "All fields are required" });
     }
 
+    const songAlreadyExists = await Song.findOne({
+        title,
+        artist,
+        album,
+        genre,
+    });
+    if (songAlreadyExists) {
+        return res.status(400).json({ message: "Song already exists" });
+    }
+
     try {
         const newSong = new Song({ title, artist, album, genre });
         await newSong.save();
