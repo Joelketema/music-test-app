@@ -6,47 +6,96 @@ import {
     addSong,
     updateSong,
     deleteSong,
-    filterByArtist,
-    filterByGenre,
+    filterByQuery,
+    setSuccess,
 } from "./songSlice";
 import { fetchStats, setStats } from "./statSlice";
+import { toast } from "react-toastify";
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
 function* fetchSongsSaga() {
-    const { data } = yield call(axios.get, baseUrl);
-    yield put(setSongs(data));
+    try {
+        const { data } = yield call(axios.get, baseUrl);
+        yield put(setSongs(data));
+    } catch (error) {
+        console.error("Fetch songs failed:", error);
+        if (error instanceof Error) {
+            toast.error(error.message);
+        } else {
+            toast.error("An unknown error occurred");
+        }
+    }
 }
 
 function* addSongSaga(action: any) {
-    yield call(axios.post, baseUrl, action.payload);
-    yield call(fetchSongsSaga);
-    yield put(fetchStats());
+    try {
+        yield call(axios.post, baseUrl, action.payload);
+        yield call(fetchSongsSaga);
+        yield put(fetchStats());
+        yield put(setSuccess());
+        toast.success("Song added successfully");
+    } catch (error) {
+        if (error instanceof Error) {
+            toast.error((error as any)?.response?.data?.message);
+        } else {
+            toast.error("An unknown error occurred");
+        }
+    }
 }
 
 function* updateSongSaga(action: any) {
-    yield call(axios.put, `${baseUrl}/${action.payload._id}`, action.payload);
-    yield call(fetchSongsSaga);
-    yield put(fetchStats());
+    try {
+        yield call(
+            axios.put,
+            `${baseUrl}/${action.payload._id}`,
+            action.payload
+        );
+        yield call(fetchSongsSaga);
+        yield put(fetchStats());
+        toast.success("Song updated successfully");
+    } catch (error) {
+        console.error("Update song failed:", error);
+        if (error instanceof Error) {
+            toast.error((error as any)?.response?.data?.message);
+        } else {
+            toast.error("An unknown error occurred");
+        }
+    }
 }
 
 function* deleteSongSaga(action: any) {
-    yield call(axios.delete, `${baseUrl}/${action.payload}`);
-    yield call(fetchSongsSaga);
-    yield put(fetchStats());
+    try {
+        yield call(axios.delete, `${baseUrl}/${action.payload}`);
+        yield call(fetchSongsSaga);
+        yield put(fetchStats());
+        toast.success("Song deleted successfully");
+    } catch (error) {
+        console.error("Delete song failed:", error);
+        if (error instanceof Error) {
+            toast.error((error as any)?.response?.data?.message);
+        } else {
+            toast.error("An unknown error occurred");
+        }
+    }
 }
 
 function* fetchStatsSaga() {
-    const { data } = yield call(axios.get, `${baseUrl}/stats`);
-    yield put(setStats(data));
+    try {
+        const { data } = yield call(axios.get, `${baseUrl}/stats`);
+        yield put(setStats(data));
+    } catch (error) {
+        console.error("Failed to fetch stats:", error);
+        yield put(setStats({}));
+    }
 }
 
-function* filterByArtistSaga(action: any) {
+function* filterByQuerySaga(action: any) {
     try {
         const { data } = yield call(axios.post, `${baseUrl}/search`, {
             query: action.payload,
         });
-        console.log("Artist filter data:", data);
+
         yield put(setSongs(data));
     } catch (error: any) {
         console.error("Artist filter failed:", error.message);
@@ -56,10 +105,17 @@ function* filterByArtistSaga(action: any) {
 }
 
 function* filterByGenreSaga(action: any) {
-    const { data } = yield call(axios.post, `${baseUrl}/byGenre`, {
-        data: action.payload,
-    });
-    yield put(setSongs(data));
+    try {
+        const { data } = yield call(axios.post, `${baseUrl}/search`, {
+            query: action.payload,
+        });
+
+        yield put(setSongs(data));
+    } catch (error: any) {
+        console.error("Genre filter failed:", error.message);
+
+        yield put(fetchSongs());
+    }
 }
 
 export default function* songsSaga() {
@@ -68,6 +124,5 @@ export default function* songsSaga() {
     yield takeEvery(updateSong.type, updateSongSaga);
     yield takeEvery(deleteSong.type, deleteSongSaga);
     yield takeEvery(fetchStats.type, fetchStatsSaga);
-    yield takeEvery(filterByArtist.type, filterByArtistSaga);
-    yield takeEvery(filterByGenre.type, filterByGenreSaga);
+    yield takeEvery(filterByQuery.type, filterByQuerySaga);
 }

@@ -7,6 +7,7 @@ const songsSlice = createSlice({
     initialState: {
         data: [] as Song[],
         loading: false,
+        success: false,
     },
     reducers: {
         fetchSongs: (state) => {
@@ -20,11 +21,12 @@ const songsSlice = createSlice({
         addSong: (_state, _action: PayloadAction<Song>) => {},
         updateSong: (_state, _action: PayloadAction<Song>) => {},
         deleteSong: (_state, _action: PayloadAction<string>) => {},
-
-        filterByArtist: (_state, _action: PayloadAction<string>) => {},
-        filterByGenre: (state, action: PayloadAction<string>) => {
-            const genre = action.payload;
-            state.data = state.data.filter((song) => song.genre === genre);
+        filterByQuery: (_state, _action: PayloadAction<string>) => {},
+        setSuccess: (state) => {
+            state.success = true;
+        },
+        resetSuccess: (state) => {
+            state.success = false;
         },
     },
 });
@@ -36,8 +38,9 @@ export const {
     updateSong,
     deleteSong,
 
-    filterByArtist,
-    filterByGenre,
+    filterByQuery,
+    setSuccess,
+    resetSuccess,
 } = songsSlice.actions;
 
 export default songsSlice.reducer;

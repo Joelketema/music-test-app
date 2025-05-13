@@ -12,6 +12,7 @@ export interface Stats {
     totalAlbums: number;
     totalGenres: number;
     popularArtist: string;
+    popularGenre: string;
     numberOfAlbumsPerArtist: number;
     numberOfSongsInEachGenre: number;
     songsInEachAlbum: number;
